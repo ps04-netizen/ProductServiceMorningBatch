@@ -3,9 +3,12 @@ package com.scaler.productservicemorningbatch.services;
 import com.scaler.productservicemorningbatch.dtos.FakeStoreProductDto;
 import com.scaler.productservicemorningbatch.models.Category;
 import com.scaler.productservicemorningbatch.models.Product;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -46,7 +49,24 @@ public class FakeStoreProductService implements ProductService {
 
     @Override
     public List<Product> getAllProducts() {
-        return null;
+        //Method 1: var is a reserved keyword in Java 10 to accept automatically capture variables from surrounding concepts
+//        var products = new ArrayList<Product>();
+//        var fakeStoreProductDtos =  restTemplate.getForObject("https://fakestoreapi.com/products/", FakeStoreProductDto[].class);
+        //Method 2:
+        ResponseEntity<FakeStoreProductDto[]> responseEntity = restTemplate.getForEntity("https://fakestoreapi.com/products", FakeStoreProductDto[].class);
+
+        FakeStoreProductDto[] fakeStoreProductDtos = responseEntity.getBody();
+        //Method 3:
+        //FakeStoreProductDto[] fakeStoreProductDtos = restTemplate.getForObject("https://fakestoreapi.com/products/", FakeStoreProductDto[].class);
+//        FakeStoreProductDto[] fakeStoreProductDtos = responseEntity.getBody();
+        //System.out.println("product list size: "+fakeStoreProductDtos.size());
+        List<Product> productList = new ArrayList<>();
+        assert fakeStoreProductDtos != null;
+        for(FakeStoreProductDto fakeStoreProductDto : fakeStoreProductDtos){
+            assert fakeStoreProductDto != null;
+            productList.add(convertFakeStoreProductDtoToProduct(fakeStoreProductDto));
+        }
+        return productList;
     }
 
     @Override
